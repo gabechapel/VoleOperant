@@ -118,7 +118,7 @@ if(adoor==0){ // Open the door if closed and retract the lever
     // OPEN DOOR
     digitalWrite(rightLED, HIGH);
     digitalWrite(doorLvrOut, HIGH);
-    delay(30);
+    delay(50);
     digitalWrite(doorLvrOut, LOW);
     delay(2000);
     openDoor();
@@ -192,12 +192,13 @@ if(adoor==0){ // Open the door if closed and retract the lever
 void openDoor(){
   //set open output to high
   digitalWrite(openOut, HIGH);
+  delay(50);
   digitalWrite(openOut, LOW);
   
   adoor = 1; // sets door status to open
   //Open Door
   digitalWrite(dirDoor, HIGH);
-  delay(30);
+ 
   digitalWrite(slpDoor, HIGH);
   for(int k=1; k<=350; k++){
       digitalWrite(stpDoor,HIGH);
@@ -216,7 +217,7 @@ void openDoor(){
 void closeDoor(){
   // Set close output to high
   digitalWrite(closeOut, HIGH);
-  delay(30);
+  delay(50);
   digitalWrite(closeOut, LOW);
   
   digitalWrite(dirDoor, LOW);
@@ -260,4 +261,3 @@ void lvrRetract(int slp, int stp, int dir){
         }
   digitalWrite(slp, LOW);
 }
-
