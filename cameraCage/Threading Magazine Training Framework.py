@@ -91,10 +91,16 @@ for i in range(5):
     time.sleep(timeII)
 
     timeIII_start = time.time()
+
+    #generate fake prob of lever press
+    rand = random.randint(1,8)
+    
+
     while time.time() - timeIII_start < timeIII:
+
         #eventually, here we will call threads to monitor
         #vole position and the levers. here its just random
-        if random.randrange(1,7)>4 and not interrupt:
+        if rand>4 and not interrupt:
             interrupt = True
             print('a lever was pressed! woweeeee')
             timestamp_queue.put('a lever was pressed! woweeeee, %f'%(time.time()-start_time))
