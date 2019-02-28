@@ -23,25 +23,6 @@ global start_time
 start_time = time.time()
 
 
-def run_job(job,q):
-    '''parse and run jobs'''
-
-    '''jobs = {'extend levers':extend_levers(),
-            'extend food lever':extend_food_lever(),
-            'extend door lever':extend_door_lever(),
-            'dispence pellet':dispence_pellet(),
-            'retract levers':retract_levers(),
-            'start_tone':start_tone()
-            }'''
-
-    jobs = {'extend levers':extend_levers,
-            'dispence pellet':dispence_pellet,
-            'retract levers':retract_levers,
-            'start tone':experiment_start_tone,
-            'pellet tone':pellet_tone
-            }
-    jobs[job](q)
-
 def extend_levers(q):
     print('extending levers')
     print('LEDs on')
@@ -85,7 +66,7 @@ def thread_distributor():
         if not do_stuff_queue.empty():
             do = do_stuff_queue.get()
 
-            run_job(do, do_stuff_queue)
+            do(do_stuff_queue)
 
 
 for x in range(4):
@@ -98,13 +79,13 @@ for x in range(4):
 for i in range(5):
     round_start = time.time()
     print("new round!!!")
-    timestamp_queue.put('Starting new round, %f'%round_start)
-    do_stuff_queue.put('start tone')
+    timestamp_queue.put('Starting new round, %f'%(time.time()-start_time))
+    do_stuff_queue.put(experiment_start_tone)
 
     #wait till tone is done
     do_stuff_queue.join()
 
-    do_stuff_queue.put('extend levers')
+    do_stuff_queue.put(extend_levers)
     do_stuff_queue.join()
 
     time.sleep(timeII)
@@ -117,13 +98,14 @@ for i in range(5):
             interrupt = True
             print('a lever was pressed! woweeeee')
             timestamp_queue.put('a lever was pressed! woweeeee, %f'%(time.time()-start_time))
-            do_stuff_queue.put('pellet tone')
-            do_stuff_queue.put('dispence pellet')
+            do_stuff_queue.put(pellet_tone)
+            do_stuff_queue.put(dispence_pellet)
 
+    do_stuff_queue.put(retract_levers)
     if not interrupt:
         print('the vole is dumb and didnt press a lever')
-        do_stuff_queue.put('pellet tone')
-        do_stuff_queue.put('dispence pellet')
+        do_stuff_queue.put(pellet_tone)
+        do_stuff_queue.put(dispence_pellet)
         do_stuff_queue.join()
 
     time.sleep(2)
