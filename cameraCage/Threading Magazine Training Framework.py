@@ -41,9 +41,10 @@ def dispence_pellet(q):
     print('sending dispence pellet signal')
     print('monitoring pellet arrival over serial')
     timestamp_queue.put('pellet out, %f'%(time.time()-start_time))
+    q.task_done()
     time.sleep(random.randrange(5,10,1)/2)
     timestamp_queue.put('pellet taken, %f'%(time.time()-start_time))
-    q.task_done()
+
 
 def retract_levers(q):
     print('LEDs off')
@@ -94,7 +95,7 @@ for i in range(5):
 
     #generate fake prob of lever press
     rand = random.randint(1,8)
-    
+
 
     while time.time() - timeIII_start < timeIII:
 
@@ -112,7 +113,7 @@ for i in range(5):
         print('the vole is dumb and didnt press a lever')
         do_stuff_queue.put(pellet_tone)
         do_stuff_queue.put(dispence_pellet)
-        do_stuff_queue.join()
+        
 
     time.sleep(2)
     while time.time() - round_start < round_time:
