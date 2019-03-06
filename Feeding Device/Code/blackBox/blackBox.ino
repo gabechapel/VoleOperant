@@ -64,13 +64,13 @@ void setup() {
   gPtrToStepper->setSpeed(255);
 
   delay (50);  // delay helps give the card a bit more time
-  lastState = 0; //Assumes there is no pellet in the dispenser
+//  lastState = 0; //Assumes there is no pellet in the dispenser
 }
 
 //The following is the main loop of the FED code
 void loop() {
   digitalWrite(dispensePin, LOW); //Make sure signal is off
-  digitalWrite(takPin, LOW); //Make sure the take signal is off
+  digitalWrite(takePin, LOW); //Make sure the take signal is off
   leverState = digitalRead(leverPin);
   if (leverState == 1) {//If we want to dispense a pellet
     power_twi_enable();
