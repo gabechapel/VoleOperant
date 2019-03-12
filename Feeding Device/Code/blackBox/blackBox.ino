@@ -71,8 +71,6 @@ void setup() {
 void loop() {
   digitalWrite(dispensePin, LOW); //Make sure signal is off
   digitalWrite(takePin, LOW); //Make sure the take signal is off
-  Serial.println("DISPENSE LOW");
-  Serial.println("TAKEN LOW");
   leverState = digitalRead(leverPin);
   if (leverState == 1) {//If we want to dispense a pellet
     power_twi_enable();
@@ -98,7 +96,6 @@ void loop() {
         }
         counter = 0;
         digitalWrite(takePin,HIGH);//Send signal that the pellet was taken
-        Serial.println("TAKEN HIGH");
       }
 
       else if (PIState == 1) { //If its unblocked, NOTHING HAS DISPENSED
@@ -115,7 +112,6 @@ void loop() {
       else if (PIState == 0 && (PIState != lastState)) { // IF its blocked and something wasn't blocking it before, PELLET WAS DISPENSED
         lastState = PIState; // lastState becomes LOW
         dispense = 1;
-        Serial.println("DISPENSE HIGH");
         digitalWrite(dispensePin,HIGH); //Send signal that pellet was dispensed
       }
 
