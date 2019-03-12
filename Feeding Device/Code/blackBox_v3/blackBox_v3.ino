@@ -7,17 +7,18 @@
 #include <avr/power.h>
 #include <Adafruit_MotorShield.h>
 
-#define PHOTO_INTERRUPTER_PIN 2 // This initializes the pin on the Arduino that the photointerrupter is connected to
+//#define PHOTO_INTERRUPTER_PIN 2 // This initializes the pin on the Arduino that the photointerrupter is connected to
 
 //State variables
-int PIState = 1;
+int PIState;
 int lastState = 1;
-int leverState = 0; // 1 when the lever is pressed
+int leverState; // 1 when the lever is pressed
 
 //Pin variables
 int leverPin = 3; // This initiatlizes the pin on the Arduino that the BNC output is connected to
 int dispensePin = 7;
 int takePin = 8;
+int PHOTO_INTERRUPTER_PIN = 2;
 
 const int CS_pin = 4;  // This initializes the SD card on pin 10
 
@@ -58,10 +59,13 @@ void setup() {
 
   // Set Arduino pins modes to input or output
   pinMode(PHOTO_INTERRUPTER_PIN, INPUT);
-  pinMode(leverPin, INPUT_PULLUP);
+  pinMode(leverPin, INPUT);
   pinMode(CS_pin, OUTPUT);
   pinMode(dispensePin, OUTPUT);
   pinMode(takePin, OUTPUT);
+  digitalWrite(leverPin, LOW);
+  digitalWrite(dispensePin, LOW);
+  digitalWrite(takePin, LOW);
 
   //Starting the Motoshield libaries
   gMotorShield.begin(); // use default I2C address of 0x40
@@ -81,24 +85,24 @@ void loop() {
     dispense = 0; //Set the loop to start
     take = 0;
     // SECTION 3, The following checks if the pellet has been removed, and if it has it dispenses another pellet.
-//    while (dispense == 0) {
       PIState = digitalRead(PHOTO_INTERRUPTER_PIN); //Reads state of the IR beam, 1 = open, 0 = blocked
       Serial.print("Photointerrupter State: "); Serial.println(PIState);
 
-      ///// Wait For Pellet To Be Dispensed /////
+////////// Wait For Pellet To Be Dispensed //////////
       while (dispense == 0){
         // Start rotating motor to dispense a pellet
         power_twi_enable();
         gPtrToStepper->step(STEPS_TO_INCREMENT / 2, FORWARD, DOUBLE);
-        delay (100);//500
+        delay (200);//500
         gPtrToStepper->step(STEPS_TO_INCREMENT / 2, BACKWARD, DOUBLE);
         delay(50);//500
         gPtrToStepper->release();
         power_twi_disable();
-        lastState = PIState;
 
         //Read photo interrupter
         PIState = digitalRead(PHOTO_INTERRUPTER_PIN); //Reads state of the IR beam, 1 = open, 0 = blocked
+        Serial.println("Photointerrupter State: "); Serial.println(PIState);
+
         if (PIState == 0){ // if pellet was dispensed
           dispense = 1;
           Serial.println("DISPENSE HIGH");
@@ -107,8 +111,9 @@ void loop() {
         }
       }
       
-      ///// Wait For Pellet To Be Taken /////
+////////// Wait For Pellet To Be Taken //////////
       while (take == 0){
+        Serial.println("TAKE 0");
         // turn off dispense pin after 1s
         t2 = millis();
         dt = abs(t2 - t1);
@@ -120,12 +125,12 @@ void loop() {
         //Read photo interrupter
         PIState = digitalRead(PHOTO_INTERRUPTER_PIN); //Reads state of the IR beam, 1 = open, 0 = blocked
         if (PIState == 1){ // if pellet was taken
+          Serial.println("TAKEN");
           power_twi_enable();
           power_spi_enable();
           while ( counter <= max_counter) {
             PIState = digitalRead(PHOTO_INTERRUPTER_PIN);
             if (PIState == 0) {
-              lastState = PIState; // lastState becomes LOW
               break;
             }
             else if (counter == max_counter) {
@@ -139,61 +144,9 @@ void loop() {
             counter++;
           }
           counter = 0;
-        }else { // if pellet was not yet taken
-          lastState = PIState;
-          enterSleep();
         }
       }
-
-      
-      
-//      if (PIState == 1 && PIState != lastState) { //If its unblocked and wasn't unblocked before, PELLET WAS TAKEN
-//        power_twi_enable();
-//        power_spi_enable();
-//
-//        while ( counter <= max_counter) {
-//          PIState = digitalRead(PHOTO_INTERRUPTER_PIN);
-//          if (PIState == 0) {
-//            lastState = PIState; // lastState becomes LOW
-//            break;
-//          }
-//          else if (counter == max_counter) {
-//            lastState = PIState; // lastState becomes HIGH
-//          }
-//          counter++;
-//        }
-//        counter = 0;
-//        digitalWrite(dispensePin,LOW);
-//        Serial.println("DISPENSE LOW");
-//        digitalWrite(takePin,HIGH);//Send signal that the pellet was taken
-//        Serial.println("TAKEN HIGH");
-//      }
-//
-//      else if (PIState == 1) { //If its unblocked, NOTHING HAS DISPENSED
-//        power_twi_enable();
-//        gPtrToStepper->step(STEPS_TO_INCREMENT / 2, FORWARD, DOUBLE);
-//        delay (100);//500
-//        gPtrToStepper->step(STEPS_TO_INCREMENT / 2, BACKWARD, DOUBLE);
-//        delay(50);//500
-//        gPtrToStepper->release();
-//        power_twi_disable();
-//        lastState = PIState;
-//      }
-//
-//      else if (PIState == 0 && (PIState != lastState)) { // IF its blocked and something wasn't blocking it before, PELLET WAS DISPENSED
-//        lastState = PIState; // lastState becomes LOW
-//        dispense = 1;
-//        Serial.println("DISPENSE HIGH");
-//        digitalWrite(dispensePin,HIGH); //Send signal that pellet was dispensed
-//      }
-//
-//      else {
-//        lastState = PIState;
-//        enterSleep();
-//        dispense = 1;
-//      }
-//      delay(100);
-//    }
+      enterSleep();
   }
 }
 //END OF TEST
