@@ -129,7 +129,6 @@ void loop() {
               break;
             }
             else if (counter == max_counter) {
-              lastState = PIState; // lastState becomes HIGH
               take = 1;
               digitalWrite(takePin, HIGH); //Send signal that the pellet was taken
               Serial.println("TAKEN HIGH");
