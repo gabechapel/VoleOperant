@@ -203,13 +203,13 @@ void loop(){
 void lvrExtrude(int slp, int stp, int dir){
   if (lvrStatus == 0){ // Only execute if levers are retracted
     //Extrude the lever
-    digitalWrite(dir,LOW);
+    digitalWrite(dir,HIGH);
     digitalWrite(slp,HIGH);
-    for(int k=1; k<=60; k++){ // part where motor actually moves, 450 steps at a time
+    for(int k=1; k<=20; k++){ // part where motor actually moves, 450 steps at a time
           digitalWrite(stp,HIGH);
-          delay(1);
+          delay(10);
           digitalWrite(stp,LOW);
-          delay(1);
+          delay(10);
           }
     digitalWrite(slp, LOW);
     lvrStatus = 1;
@@ -220,13 +220,13 @@ void lvrExtrude(int slp, int stp, int dir){
 void lvrRetract(int slp, int stp, int dir){
   if (lvrStatus == 1){ // Only execute if levers are extruded
     //Retract the lever
-    digitalWrite(dir,HIGH);
+    digitalWrite(dir,LOW);
     digitalWrite(slp,HIGH);
-    for(int k=1; k<=60; k++){ // part where motor actually moves, 450 steps at a time
+    for(int k=1; k<=20; k++){ // part where motor actually moves, 450 steps at a time
           digitalWrite(stp,HIGH);
-          delay(1);
+          delay(10);
           digitalWrite(stp,LOW);
-          delay(1);
+          delay(10);
           }
     digitalWrite(slp, LOW);
     lvrStatus = 0;

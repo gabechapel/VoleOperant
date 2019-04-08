@@ -72,6 +72,8 @@ void loop() {
   digitalWrite(dispensePin, LOW); //Make sure signal is off
   digitalWrite(takePin, LOW); //Make sure the take signal is off
   leverState = digitalRead(leverPin);
+  PIState = digitalRead(PHOTO_INTERRUPTER_PIN); //Reads state of the IR beam, 1 = open, 0 = blocked
+  Serial.print("Photointerrupter State: "); Serial.println(PIState);
   if (leverState == 1) {//If we want to dispense a pellet
     power_twi_enable();
     dispense = 0; //Set the loop to start
@@ -117,7 +119,7 @@ void loop() {
 
       else {
         lastState = PIState;
-        enterSleep();
+//        enterSleep();
         dispense = 1;
       }
       delay(100);
@@ -126,21 +128,21 @@ void loop() {
 }
 //END OF TEST
 
-// function for entering sleep mode to save power
-void enterSleep() {
-  power_usart0_disable();// Serial (USART)
-  sleep_enable();
-  attachInterrupt(0, pinInterrupt, RISING);
-  lastState = 0;
-  delay(100);
-
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  cli();
-  sleep_bod_disable();
-  sei();
-  sleep_cpu();
-  sleep_disable();
-}
+//// function for entering sleep mode to save power
+//void enterSleep() {
+//  power_usart0_disable();// Serial (USART)
+//  sleep_enable();
+//  attachInterrupt(0, pinInterrupt, RISING);
+//  lastState = 0;
+//  delay(100);
+//
+//  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+//  cli();
+//  sleep_bod_disable();
+//  sei();
+//  sleep_cpu();
+//  sleep_disable();
+//}
 
 // function for allowing the FED to wakeup when pellet is removed
 void pinInterrupt(void) {
