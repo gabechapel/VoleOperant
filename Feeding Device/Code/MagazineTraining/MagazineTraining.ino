@@ -39,7 +39,7 @@ const int time3 = 1000;
 //Section IV
 const int time4 = 2000;
 //Section V
-const long time5 = 120000; // ints are 16-bit (--32,768 to 32,767)
+const long time5 = 60000; // ints are 16-bit (--32,768 to 32,767)
 
 
 // Important Global Variables
