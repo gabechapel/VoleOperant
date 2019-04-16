@@ -9,6 +9,7 @@ const int doorLvr = A0; // door lever
 const int foodLvr = A1;
 const int foodLED = 31; //blue
 const int doorLED = 32; //green
+const int dispLED = 33;
 
 //Transmit Pins
 const int dispenseOut = 23; //high when pellet should be dispensed, connects to 3 on other Arduino
@@ -141,9 +142,11 @@ void loop(){
     if (dispenseRead == 1){ //if pellet is dispensed
       Serial.println("Disp" + String(millis()));
       digitalWrite(dispenseOut, LOW);
+      digitalWrite(dispLED, HIGH);
     }
     if (retrieveRead == 1){ //if pellet is retrieved
       Serial.println("Retr" + String(millis()));
+      digitalWrite(dispLED, LOW);
     }
   }
   noTone(buzz);
@@ -163,9 +166,11 @@ void loop(){
     if (dispenseRead == 1){ //if pellet is dispensed
       Serial.println("Disp" + String(millis()));
       digitalWrite(dispenseOut,LOW);
+      digitalWrite(dispLED,HIGH);
     }
     if (retrieveRead == 1){ //if pellet is retrieved
       Serial.println("Retr" + String(millis()));
+      digitalWrite(dispLED,LOW);
     }
     if (doorRead == 0){// if door lever is pressed
       Serial.println("Dpress" + String(millis()));
@@ -192,9 +197,11 @@ void loop(){
     if (dispenseRead == 1){ //if pellet is dispensed
       Serial.println("Disp" + String(millis()));
       digitalWrite(dispenseOut,LOW);
+      digitalWrite(dispLED,HIGH);
     }
     if (retrieveRead == 1){ //if pellet is retrieved
       Serial.println("Retr" + String(millis()));
+      digitalWrite(dispLED,LOW);
     }
   }
 //  
