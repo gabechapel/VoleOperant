@@ -6,6 +6,16 @@ import random
 import os
 import csv
 import RPi.GPIO as GPIO
+from adafruit_servokit import ServoKit
+global kit
+kit = ServoKit(channels=16)
+##### double check which servo is which. I'm writing this as:
+##### kit[0] = food lever
+##### kit[1] = partner lever
+##### kit[2] = door
+
+servo_dict = {'food':kit.servo[0], 'social':kit.servo[1], 'door':kit.servo[2]}
+
 GPIO.setmode(GPIO.BOARD)
 
 
@@ -114,11 +124,24 @@ def monitor_lever(ds_queue, args):
 
 def extend_lever(q, args):
     global start_time
+    global servo_dict
     lever_ID = args[0]
-    print('extending levers')
+    print('extending lever %s'%lever_ID)
     print('LEDs on')
+    servo_dict{'lever_ID'}.angle = 145
     GPIO.output(pins['led_%s'%lever_ID], 1)
     timestamp_queue.put('Levers out, %f'%(time.time()-start_time))
+    q.task_done()
+
+def retract_lever(q, args):
+    global start_time
+    global servo_dict
+    lever_ID = args[0]
+    print('LEDs off')
+    GPIO.output(pins['led_%s'%lever_ID], 0)
+    servo_dict[lever_ID].angle(0)
+    print('retracting levers')
+    timestamp_queue.put('Levers retracted, %f'%(time.time()-start_time))
     q.task_done()
 
 def pellet_tone(q):
@@ -165,6 +188,7 @@ def dispence_pellet(q):
     start_mon = time.time()
     timeout = round_time - timeII - timeIV - 1 #round time minus intervals and start tone time
     pellet_out = False
+
     while time.time()- start_mon  < timeout:
         if GPIO.input(pins['read_pellet_out']):
             not_lever +=1
@@ -199,15 +223,6 @@ def dispence_pellet(q):
     return ''
 
 
-def retract_lever(q, args):
-    global start_time
-    lever_ID = args[0]
-    print('LEDs off')
-    GPIO.output(pins['led_%s'%lever_ID], 0)
-    print('retracting levers')
-    timestamp_queue.put('Levers retracted, %f'%(time.time()-start_time))
-    q.task_done()
-
 def experiment_start_tone(q):
     global start_time
     print('starting experiment tone')
@@ -239,6 +254,8 @@ for x in range(4):
     t.start()
     print("started %i"%x )
 
+
+### master looper ###
 for i in range(loops):
     round_start = time.time()
     print("new round #%i!!!"%i)
