@@ -19,14 +19,14 @@ void loop() {
   // put your main code here, to run repeatedly:
   read1 = analogRead(bottle1);
   read2 = analogRead(bottle2);
-  if ((read1 >50)&&(started == false)){ //if the vole starts licking the left bottle
+  if ((read1 >150)&&(started == false)){ //if the vole starts licking the left bottle
     long time1 = millis() - startTime; //Get start time
     String left = "LEFT: ";
     String result1 = left + time1;
     Serial.println(result1);
     started = true;
   }
-    if ((read2 >50)&&(started == false)){ //if the vole starts licking the left bottle
+    if ((read2 >150)&&(started == false)){ //if the vole starts licking the left bottle
     long time2 = millis() - startTime; //Get start time
     String right = "RIGHT: ";
     String result2 = right + time2;
