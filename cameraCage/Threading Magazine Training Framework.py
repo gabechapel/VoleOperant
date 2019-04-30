@@ -113,7 +113,7 @@ for i in range(5):
         print('the vole is dumb and didnt press a lever')
         do_stuff_queue.put(pellet_tone)
         do_stuff_queue.put(dispence_pellet)
-        
+
 
     time.sleep(2)
     while time.time() - round_start < round_time:

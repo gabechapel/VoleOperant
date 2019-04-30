@@ -64,21 +64,14 @@ void setup() {
   gPtrToStepper->setSpeed(255);
 
   delay (50);  // delay helps give the card a bit more time
-<<<<<<< HEAD
   lastState = 0; //Assumes there is no pellet in the dispenser
-=======
 //  lastState = 0; //Assumes there is no pellet in the dispenser
->>>>>>> faf9556e55aa5f6eb85ba56c4d9b8dd67cc686c3
 }
 
 //The following is the main loop of the FED code
 void loop() {
   digitalWrite(dispensePin, LOW); //Make sure signal is off
-<<<<<<< HEAD
-  digitalWrite(takPin, LOW); //Make sure the take signal is off
-=======
   digitalWrite(takePin, LOW); //Make sure the take signal is off
->>>>>>> faf9556e55aa5f6eb85ba56c4d9b8dd67cc686c3
   leverState = digitalRead(leverPin);
   PIState = digitalRead(PHOTO_INTERRUPTER_PIN); //Reads state of the IR beam, 1 = open, 0 = blocked
   Serial.print("Photointerrupter State: "); Serial.println(PIState);

@@ -1,7 +1,4 @@
-
-// This version of readRX is geared towards training the voles in two chambers, removing RF components from previous versions.
-// It is designed to drive the door motor when a lever or button is pressed, turn on a light and buzzer, and retract levers when not in use.
-
+#include <Servo.h>
 
 // Pin Names
 const int buzz = 2; // buzzer
@@ -9,6 +6,7 @@ const int doorLvr = A0; // door lever
 const int foodLvr = A1;
 const int foodLED = 31; //blue
 const int doorLED = 32; //green
+const int dispLED = 33;
 
 //Transmit Pins
 const int dispenseOut = 23; //high when pellet should be dispensed, connects to 3 on other Arduino
@@ -17,6 +15,7 @@ const int dispenseOut = 23; //high when pellet should be dispensed, connects to 
 const int dispenseIn = 24; //high when pellet is dispensed, connects to 7 on other Arduino
 const int retrieveIn = 25; //high when pellet is retrieved, connects to 8 on other Arduino
 
+////Stepper Motor/////
 //Door lever driver pins
 const int slpDoorLvr = 8; // reset and sleep driver pin
 const int stpDoorLvr = 9; // stepper motor pwm
@@ -26,6 +25,9 @@ const int slpFoodLvr = 11; // reset and sleep driver pin
 const int stpFoodLvr = 12; // stepper motor pwm
 const int dirFoodLvr = 13; // direction driver pin
 
+/////Servo Motor/////
+const int doorServoPin = 3;
+const int foodServoPin = 4;
 
 // USER DEFINED VARIABLES
 // Section I
@@ -43,6 +45,8 @@ const long time5 = 60000; // ints are 16-bit (--32,768 to 32,767)
 
 
 // Important Global Variables
+Servo doorServo; // servo objects
+Servo foodServo;
 long t1 = 0; // milli counter 1
 long t2 = 0; // milli counter 2
 long dt = 0; // elapsed time
@@ -50,7 +54,7 @@ int lvrStatus = 0;
 
 void setup(){
   Serial.begin(9600);
-
+  
   pinMode(buzz, OUTPUT);
 
   //Lever Setup
@@ -58,6 +62,7 @@ void setup(){
   pinMode(foodLvr, INPUT_PULLUP);
   pinMode(foodLED,OUTPUT);
   pinMode(doorLED,OUTPUT);
+  pinMode(dispLED, OUTPUT);
   
   //Labjack setup
   pinMode(dispenseOut, OUTPUT);
@@ -80,6 +85,13 @@ void setup(){
   pinMode(stpFoodLvr, OUTPUT);
   digitalWrite(stpFoodLvr,LOW);
   pinMode(dirFoodLvr, OUTPUT);
+
+  //Servo Setup
+  doorServo.attach(doorServoPin);
+  foodServo.attach(foodServoPin);
+  doorServo.write(0); // Start servos retracted
+  foodServo.write(0);
+  
   delay(10000);
 }
 
@@ -103,7 +115,10 @@ void loop(){
   digitalWrite(foodLED,HIGH);
   digitalWrite(doorLED,HIGH);
   // Extrude levers
-  lvrExtrude(slpFoodLvr, stpFoodLvr, dirFoodLvr);
+  doorServo.write(150);
+  foodServo.write(150);
+  Serial.println("LvrIn" + String(millis()));
+//  lvrExtrude(slpFoodLvr, stpFoodLvr, dirFoodLvr);
 //  lvrExtrude(slpDoorLvr, stpDoorLvr, dirDoorLvr);
   // Start timer
   t1 = millis();
@@ -141,9 +156,11 @@ void loop(){
     if (dispenseRead == 1){ //if pellet is dispensed
       Serial.println("Disp" + String(millis()));
       digitalWrite(dispenseOut, LOW);
+      digitalWrite(dispLED, HIGH);
     }
     if (retrieveRead == 1){ //if pellet is retrieved
       Serial.println("Retr" + String(millis()));
+      digitalWrite(dispLED, LOW);
     }
   }
   noTone(buzz);
@@ -163,9 +180,11 @@ void loop(){
     if (dispenseRead == 1){ //if pellet is dispensed
       Serial.println("Disp" + String(millis()));
       digitalWrite(dispenseOut,LOW);
+      digitalWrite(dispLED,HIGH);
     }
     if (retrieveRead == 1){ //if pellet is retrieved
       Serial.println("Retr" + String(millis()));
+      digitalWrite(dispLED,LOW);
     }
     if (doorRead == 0){// if door lever is pressed
       Serial.println("Dpress" + String(millis()));
@@ -176,7 +195,11 @@ void loop(){
   }
   digitalWrite(foodLED,LOW);
   digitalWrite(doorLED,LOW);
-  lvrRetract(slpFoodLvr, stpFoodLvr, dirFoodLvr);
+  //Retract levers
+  doorServo.write(0);
+  foodServo.write(0);
+  Serial.println("LvrOut" + String(millis()));
+//  lvrRetract(slpFoodLvr, stpFoodLvr, dirFoodLvr);
 //  lvrRetract(slpDoorLvr, stpDoorLvr, dirDoorLvr);
   
 
@@ -192,9 +215,11 @@ void loop(){
     if (dispenseRead == 1){ //if pellet is dispensed
       Serial.println("Disp" + String(millis()));
       digitalWrite(dispenseOut,LOW);
+      digitalWrite(dispLED,HIGH);
     }
     if (retrieveRead == 1){ //if pellet is retrieved
       Serial.println("Retr" + String(millis()));
+      digitalWrite(dispLED,LOW);
     }
   }
 //  
@@ -213,7 +238,6 @@ void lvrExtrude(int slp, int stp, int dir){
           }
     digitalWrite(slp, LOW);
     lvrStatus = 1;
-    Serial.println("LvrIn" + String(millis()));
   }
 }
 
@@ -230,6 +254,5 @@ void lvrRetract(int slp, int stp, int dir){
           }
     digitalWrite(slp, LOW);
     lvrStatus = 0;
-    Serial.println("LvrOut" + String(millis()));
   }
 }
