@@ -6,7 +6,7 @@ import csv
 
 ### Setup the serial port
 # change this string depending upon where your computer makes a device for the Arduino
-serialport = "/dev/cu.usbmodem1411"
+serialport = "COM6"
 ser = serial.Serial(serialport, 9600)
 
 ### Setup the CSV file
