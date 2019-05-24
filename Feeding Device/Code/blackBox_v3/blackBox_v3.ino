@@ -79,6 +79,8 @@ void setup() {
 
 //The following is the main loop of the FED code
 void loop() {
+  PIState = analogRead(PHOTO_INTERRUPTER_PIN); //Reads state of the IR beam, 1 = open, 0 = blocked
+  Serial.print("Photointerrupter State: "); Serial.println(PIState);
   leverState = digitalRead(leverPin);
   if (leverState == 1) {//If we want to dispense a pellet
     power_twi_enable();

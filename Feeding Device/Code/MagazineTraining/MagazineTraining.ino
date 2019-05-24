@@ -222,7 +222,6 @@ void loop(){
       digitalWrite(dispLED,LOW);
     }
   }
-//  
 } // void loop end
 
 void lvrExtrude(int slp, int stp, int dir){
